@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Core/AppImages.dart';
 import '../My_package/package_order_details.dart';
 import '../colors/custom_color.dart';
+import '../document_preview.dart';
 import '../form_internet.dart';
 import '../language/hindi.dart';
 import '../network/url.dart';
@@ -337,7 +338,7 @@ class _DigitallySign1State extends State<DigitallySign1> {
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: SizedBox(
-                height: 1000,
+                // height: 1000,
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -925,74 +926,7 @@ class _DigitallySign1State extends State<DigitallySign1> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextFormField(
-                              controller:
-                                  _ByNameIncasesurveynoisnotknownController,
-                              decoration: InputDecoration(
-                                label: RichText(
-                                  text: TextSpan(
-                                    text: LocalizedStrings.getString(
-                                      'byName',
-                                      widget.isToggled,
-                                    ),
-                                    style: AppFontStyle2.blinker(
-                                      color: const Color(0xFF36322E),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text:
-                                            ' ${LocalizedStrings.getString('byNameHint', widget.isToggled)}',
-                                        style: AppFontStyle.poppins(
-                                          color: const Color(0xFF36322E),
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                  borderSide:
-                                      BorderSide(color: Color(0xFFC5C5C5)),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                  borderSide:
-                                      BorderSide(color: Color(0xFFC5C5C5)),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                  borderSide:
-                                      BorderSide(color: Color(0xFFC5C5C5)),
-                                ),
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                  RegExp(
-                                    r'^[\u0900-\u097F\u0966-\u096F a-zA-Z\s/]+$',
-                                  ),
-                                ),
-                                TextInputFormatter.withFunction(
-                                    (oldValue, newValue) {
-                                  String text = newValue.text;
-                                  text = text.replaceAll(RegExp(r'\s+'), ' ');
-                                  text = text.trimLeft();
-
-                                  return text == newValue.text
-                                      ? newValue
-                                      : TextEditingValue(
-                                          text: text,
-                                          selection: TextSelection.collapsed(
-                                            offset: text.length,
-                                          ),
-                                        );
-                                }),
-                                LengthLimitingTextInputFormatter(50),
-                              ],
-                              textCapitalization: TextCapitalization.words,
+                            FormField<String>(
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return ValidationMessagesseventweleve
@@ -1014,7 +948,135 @@ class _DigitallySign1State extends State<DigitallySign1> {
                                 }
                                 return null;
                               },
-                              style: AppFontStyle2.blinker(),
+                              builder: (FormFieldState<String> state) {
+                                return TextFormField(
+                                  controller:
+                                      _ByNameIncasesurveynoisnotknownController,
+                                  decoration: InputDecoration(
+                                    label: RichText(
+                                      text: TextSpan(
+                                        text: LocalizedStrings.getString(
+                                          'byName',
+                                          widget.isToggled,
+                                        ),
+                                        style: AppFontStyle2.blinker(
+                                          color: state.hasError
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .error // Natural error color on validation error
+                                              : const Color(
+                                                  0xFF36322E), // Default color
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text:
+                                                ' ${LocalizedStrings.getString('byNameHint', widget.isToggled)}',
+                                            style: AppFontStyle.poppins(
+                                              color: state.hasError
+                                                  ? Theme.of(context)
+                                                      .colorScheme
+                                                      .error // Natural error color on validation error
+                                                  : const Color(
+                                                      0xFF36322E), // Default color
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide:
+                                          BorderSide(color: Color(0xFFC5C5C5)),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide:
+                                          BorderSide(color: Color(0xFFC5C5C5)),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide:
+                                          BorderSide(color: Color(0xFFC5C5C5)),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error), // Natural error border
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error), // Natural error border when focused
+                                    ),
+                                    errorStyle: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .error, // Natural error text color
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                      RegExp(
+                                        r'^[\u0900-\u097F\u0966-\u096F a-zA-Z\s/]+$',
+                                      ),
+                                    ),
+                                    TextInputFormatter.withFunction(
+                                        (oldValue, newValue) {
+                                      String text = newValue.text;
+                                      text =
+                                          text.replaceAll(RegExp(r'\s+'), ' ');
+                                      text = text.trimLeft();
+
+                                      return text == newValue.text
+                                          ? newValue
+                                          : TextEditingValue(
+                                              text: text,
+                                              selection:
+                                                  TextSelection.collapsed(
+                                                offset: text.length,
+                                              ),
+                                            );
+                                    }),
+                                    LengthLimitingTextInputFormatter(50),
+                                  ],
+                                  textCapitalization: TextCapitalization.words,
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return ValidationMessagesseventweleve
+                                          .getMessage(
+                                        'pleaseEnterByName',
+                                        widget.isToggled,
+                                      );
+                                    }
+                                    final trimmedValue = value.trim();
+                                    if (RegExp(
+                                      r'<.*?>|script|alert|on\w+=',
+                                      caseSensitive: false,
+                                    ).hasMatch(trimmedValue)) {
+                                      return ValidationMessagesseventweleve
+                                          .getMessage(
+                                        'invalidCharacters',
+                                        widget.isToggled,
+                                      );
+                                    }
+                                    return null;
+                                  },
+                                  style: AppFontStyle2.blinker(),
+                                  onChanged: (value) {
+                                    state.didChange(
+                                        value); // Update FormField state on text change
+                                  },
+                                );
+                              },
                             ),
                             const SizedBox(height: 16),
                           ],
@@ -1202,14 +1264,15 @@ class _DigitallySign1State extends State<DigitallySign1> {
                             return null;
                           },
                         ),
+                        const SizedBox(height: 16),
                       ],
-                      const SizedBox(height: 16),
                       Visibility(
                         visible: widget.tblName != 'tbl_e_mutation_extract' &&
                             widget.tblName != 'tbl_bhu_naksha',
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // const SizedBox(height: 16),
                             FormField<String>(
                               validator: (value) {
                                 if (selectedLanguage == null ||
@@ -1401,7 +1464,13 @@ class _DigitallySign1State extends State<DigitallySign1> {
                               ),
                               child: TextButton(
                                 onPressed: () {
-                                  print("View Sample button pressed");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DocumentPreviewPage(),
+                                    ),
+                                  );
                                 },
                                 child: Center(
                                   child: Text(

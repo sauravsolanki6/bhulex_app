@@ -91,38 +91,35 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        backgroundColor: Color(0xFFF9FAFB),
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: Row(
-            children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back_sharp, color: Colors.black),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+    return Scaffold(
+      backgroundColor: Color(0xFFF9FAFB),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back_sharp, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            Text(
+              'Notifications',
+              style: AppFontStyle2.blinker(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF353B43),
               ),
-              Text(
-                'Notifications',
-                style: AppFontStyle2.blinker(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF353B43),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        body:
-            _isLoading
-                ? _buildShimmer()
-                : _displayedNotifications.isEmpty
-                ? Center(
+      ),
+      body: _isLoading
+          ? _buildShimmer()
+          : _displayedNotifications.isEmpty
+              ? Center(
                   child: Column(
                     mainAxisAlignment:
                         MainAxisAlignment.center, // Center content vertically
@@ -156,7 +153,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     ],
                   ),
                 )
-                : RefreshIndicator(
+              : RefreshIndicator(
                   onRefresh: _refreshNotifications,
                   child: Scrollbar(
                     thickness: 10.0,
@@ -170,7 +167,6 @@ class _NotificationPageState extends State<NotificationPage> {
                         return NotificationItem(
                           message: notification.message,
                           text: notification.text,
-
                           timeAgo: notification.timeAgo,
                           icon: notification.icon,
                           appRedirectionUrl: notification.appRedirectionUrl,
@@ -180,7 +176,6 @@ class _NotificationPageState extends State<NotificationPage> {
                     ),
                   ),
                 ),
-      ),
     );
   }
 
@@ -230,7 +225,6 @@ class NotificationItem extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(10),
         onTap: () async {},
-
         child: Padding(
           padding: const EdgeInsets.only(left: 12.0, right: 12),
           child: Row(
@@ -275,7 +269,7 @@ class NotificationItem extends StatelessWidget {
                                       message,
                                       style: AppFontStyle2.blinker(
                                         fontSize: 15,
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: FontWeight.w600,
                                         color: Color(0xFF353B43),
                                       ),
                                       maxLines: 1,
@@ -285,8 +279,8 @@ class NotificationItem extends StatelessWidget {
                                   Text(
                                     timeAgo, // Time ago on the left side
                                     style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
                                       color: Color(0xFFA0A0A0),
                                     ),
                                   ),

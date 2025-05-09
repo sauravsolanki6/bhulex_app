@@ -20,6 +20,7 @@ import 'E-Applications/aapli_chawadi_page.dart';
 import 'E-Applications/area_converter_page.dart';
 import 'E-Applications/e_property_valuation_page.dart';
 import 'My_package/package_details_new.dart';
+import 'Order/all_order.dart';
 import 'Order/all_packages.dart';
 import 'Order/order_list.dart';
 import 'Order/package_details.dart';
@@ -294,11 +295,17 @@ class _HomePage2State extends State<HomePage2> {
         print("Customer Care tapped");
         break;
       case 2:
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) =>
+        //         const MyOrderScreen(package_id: '', customer_id: ''),
+        //   ),
+        // );
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                const MyOrderScreen(package_id: '', customer_id: ''),
+            builder: (context) => const OrderCardsPage(),
           ),
         );
         break;
@@ -1199,22 +1206,15 @@ class _HomePage2State extends State<HomePage2> {
                                           ),
                                         ),
                                       ),
-                                      Obx(
-                                        () => Text(
-                                          LocalizationStringsinstant.getString(
-                                            instantTextMap[dummyCategory[
-                                                    'category_name']] ??
-                                                '',
-                                            languageController.isToggled.value,
-                                          ),
-                                          style: AppFontStyle2.blinker(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colorfile.lightgrey,
-                                          ),
-                                          textAlign: TextAlign.end,
+                                      Text(
+                                        'Within 12 hours',
+                                        style: AppFontStyle2.blinker(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colorfile.lightgrey,
                                         ),
-                                      ),
+                                        textAlign: TextAlign.end,
+                                      )
                                     ],
                                   ),
                                 ),
@@ -1863,22 +1863,22 @@ class _HomePage2State extends State<HomePage2> {
                     languageController.isToggled.value,
                   ),
                 ),
-                BottomNavigationBarItem(
-                  icon: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/images/packageicon.png',
-                        width: 21,
-                        height: 22,
-                      ),
-                    ],
-                  ),
-                  label: BottomNavigationStrings.getString(
-                    'Package',
-                    languageController.isToggled.value,
-                  ),
-                ),
+                // BottomNavigationBarItem(
+                //   icon: Stack(
+                //     alignment: Alignment.center,
+                //     children: [
+                //       Image.asset(
+                //         'assets/images/packageicon.png',
+                //         width: 21,
+                //         height: 22,
+                //       ),
+                //     ],
+                //   ),
+                //   label: BottomNavigationStrings.getString(
+                //     'Package',
+                //     languageController.isToggled.value,
+                //   ),
+                // ),
               ],
               currentIndex: _selectedIndex,
               selectedItemColor: Colorfile.bordertheme,
@@ -1897,7 +1897,7 @@ class _HomePage2State extends State<HomePage2> {
 }
 
 final Map<String, dynamic> dummyCategory = {
-  "category_name": "E-Application",
+  "category_name": "E-Applications",
   "category_name_in_local_language": "मालमत्ता सेवा",
   "service": [
     {
