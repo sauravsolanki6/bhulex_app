@@ -10,6 +10,18 @@ class ValidationMessagesrera {
         'en': 'Please enter builder/promoter name',
         'local': 'कृपया बांधकाम व्यावसायिक/प्रवर्तकाचे नाव प्रविष्ट करा',
       },
+      'pleaseEnterPincode': {
+        'en': 'Please enter pincode',
+        'local': 'कृपया पिनकोड प्रविष्ट करा',
+      },
+      'invalidPincode': {
+        'en': 'Pincode must be 6 digits',
+        'local': 'पिनकोड 6 अंकांचा असावा',
+      },
+      'pleaseEnterCity': {
+        'en': 'Please enter city',
+        'local': 'कृपया शहर प्रविष्ट करा',
+      },
       'invalidCharacters': {
         'en': 'Invalid characters or script content detected',
         'local': 'अवैध अक्षरे किंवा स्क्रिप्ट सामग्री आढळली',

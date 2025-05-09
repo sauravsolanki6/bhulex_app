@@ -26,6 +26,18 @@ class indexValidationMessages {
         'en': 'Only alphabets and spaces allowed',
         'local': 'फक्त अक्षरे आणि रिकाम्या जागा परवानगी आहेत',
       },
+      'pleaseSelectYear': {
+        'en': 'Please select a year',
+        'local': 'कृपया वर्ष निवडा',
+      },
+      'onlyAlphabetsAndSingleSpaces': {
+        'en': 'Only alphabets and single spaces allowed',
+        'local': 'फक्त अक्षरे आणि एकल रिकाम्या जागा परवानगी आहेत',
+      },
+      'pleaseSelectVillage': {
+        'en': 'Please select a village',
+        'local': 'कृपया गाव निवडा',
+      },
     };
 
     final language = isToggled ? 'local' : 'en';

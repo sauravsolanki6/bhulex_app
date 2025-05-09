@@ -5,4 +5,5 @@ class AppImages {
   static const String call = 'assets/images/Call.png';
   static const String bhuleximage = 'assets/images/bhuleximage.svg';
   static const String whatsapp = 'assets/images/whatsapp.png';
+  static const String bookCall = 'assets/images/book.png';
 }

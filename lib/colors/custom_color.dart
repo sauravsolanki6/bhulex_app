@@ -28,6 +28,8 @@ class Colorfile {
   static const Color lightblack = Color(0xFF36322E);
   static const Color defaultblack = Color(0xFF373C3B);
   static const Color lightwhite = Color(0xFFC5C5C5);
+  static const Color borderDark = Color(0xFF36322E);
+  static const Color servicename = Color(0xFF36332F);
   static const Color white = Colors.white;
   // static const Color anotherColor = Color(0xFFxxxxxx);
 }

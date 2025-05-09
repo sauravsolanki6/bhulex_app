@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Core/AppImages.dart';
 import '../My_package/package_order_details.dart';
 import '../colors/custom_color.dart';
@@ -19,17 +16,17 @@ import '../network/url.dart';
 import '../quicke_services_forms/pay.dart';
 import '../validations_chan_lang/mortage.dart';
 
-class MortgageReports extends StatefulWidget {
+class CersaiReport extends StatefulWidget {
   final String id;
   final String serviceName;
   final String tblName;
-  final String packageId; // Add this parameter
-  final bool isToggled; // Added for language toggle
-  final String serviceNameInLocalLanguage; // Added for local service name
+  final String packageId;
+  final bool isToggled;
+  final String serviceNameInLocalLanguage;
   final String lead_id;
   final String customer_id;
   final String package_lead_id;
-  const MortgageReports({
+  const CersaiReport({
     required this.id,
     required this.packageId,
     required this.serviceName,
@@ -46,9 +43,11 @@ class MortgageReports extends StatefulWidget {
   _MortgageReportsState createState() => _MortgageReportsState();
 }
 
-class _MortgageReportsState extends State<MortgageReports> {
-  final TextEditingController _ownerNameController = TextEditingController();
+class _MortgageReportsState extends State<CersaiReport> {
   final TextEditingController _CTSNoController = TextEditingController();
+  final TextEditingController _pincodeController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _debtorNameController = TextEditingController();
   String? Selectedcity;
   String? SelectedId;
   List<Map<String, dynamic>> talukaData = [];
@@ -61,13 +60,12 @@ class _MortgageReportsState extends State<MortgageReports> {
   String? selectedTalukaId;
   final _formKey = GlobalKey<FormState>();
   bool isLoading = true;
-  final NetworkChecker _networkChecker = NetworkChecker(); // Add NetworkChecker
+  final NetworkChecker _networkChecker = NetworkChecker();
 
   @override
   void initState() {
     super.initState();
-    _networkChecker.startMonitoring(context); // Start network monitoring
-
+    _networkChecker.startMonitoring(context);
     _fetchCity();
   }
 
@@ -89,7 +87,6 @@ class _MortgageReportsState extends State<MortgageReports> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print("Form submitted successfully: $responseData");
-        // Check if packageId is empty
         if (widget.packageId == "") {
           Navigator.pushReplacement(
             context,
@@ -133,7 +130,6 @@ class _MortgageReportsState extends State<MortgageReports> {
     final String url = URLS().get_all_city_apiUrl;
     log('City URL: $url');
 
-    // Fetch state_id from SharedPreferences and set it to "22" for testing
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('state_id', '22');
     log('state_id 22 saved to SharedPreferences');
@@ -256,6 +252,9 @@ class _MortgageReportsState extends State<MortgageReports> {
       selectedVillageName = null;
       selectedTaluka = null;
       _CTSNoController.clear();
+      _pincodeController.clear();
+      _addressController.clear();
+      _debtorNameController.clear();
     });
   }
 
@@ -363,15 +362,6 @@ class _MortgageReportsState extends State<MortgageReports> {
                           widget.isToggled,
                         );
                       }
-                      // if (!RegExp(
-                      //   r'^[\p{L}\s]+$',
-                      //   unicode: true,
-                      // ).hasMatch(trimmedValue)) {
-                      //   return ValidationMessagesmortage.getMessage(
-                      //     'onlyAlphabetsAllowed',
-                      //     widget.isToggled,
-                      //   );
-                      // }
                       return null;
                     },
                     builder: (FormFieldState<String> state) {
@@ -490,15 +480,6 @@ class _MortgageReportsState extends State<MortgageReports> {
                           widget.isToggled,
                         );
                       }
-                      // if (!RegExp(
-                      //   r'^[\p{L}\s]+$',
-                      //   unicode: true,
-                      // ).hasMatch(trimmedValue)) {
-                      //   return ValidationMessagesmortage.getMessage(
-                      //     'onlyAlphabetsAllowed',
-                      //     widget.isToggled,
-                      //   );
-                      // }
                       return null;
                     },
                     builder: (FormFieldState<String> state) {
@@ -622,15 +603,6 @@ class _MortgageReportsState extends State<MortgageReports> {
                           widget.isToggled,
                         );
                       }
-                      // if (!RegExp(
-                      //   r'^[\p{L}\s]+$',
-                      //   unicode: true,
-                      // ).hasMatch(trimmedValue)) {
-                      //   return ValidationMessagesmortage.getMessage(
-                      //     'onlyAlphabetsAllowed',
-                      //     widget.isToggled,
-                      //   );
-                      // }
                       return null;
                     },
                     builder: (FormFieldState<String> state) {
@@ -759,11 +731,8 @@ class _MortgageReportsState extends State<MortgageReports> {
                       ),
                       TextInputFormatter.withFunction((oldValue, newValue) {
                         String text = newValue.text;
-                        // Replace multiple spaces with single space
                         text = text.replaceAll(RegExp(r'\s+'), ' ');
-                        // Remove leading space
                         text = text.trimLeft();
-
                         return text == newValue.text
                             ? newValue
                             : TextEditingValue(
@@ -798,10 +767,114 @@ class _MortgageReportsState extends State<MortgageReports> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
-                    controller: _ownerNameController,
+                    controller: _pincodeController,
+                    decoration: InputDecoration(
+                      hintText: widget.isToggled ? 'पिनकोड' : 'Pincode',
+                      hintStyle: AppFontStyle2.blinker(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        height: 1.57,
+                        color: const Color(0xFF36322E),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(6),
+                    ],
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return widget.isToggled
+                            ? 'कृपया पिनकोड प्रविष्ट करें'
+                            : 'Please enter Pincode';
+                      }
+                      if (!RegExp(r'^\d{6}$').hasMatch(value)) {
+                        return widget.isToggled
+                            ? 'कृपया वैध 6 अंकों का पिनकोड प्रविष्ट करें'
+                            : 'Please enter a valid 6-digit Pincode';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _addressController,
+                    decoration: InputDecoration(
+                      hintText: widget.isToggled ? 'पता' : 'Address',
+                      hintStyle: AppFontStyle2.blinker(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        height: 1.57,
+                        color: const Color(0xFF36322E),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
+                      ),
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^[\u0900-\u097F a-zA-Z0-9\s,./-]+$'),
+                      ),
+                      TextInputFormatter.withFunction((oldValue, newValue) {
+                        String text = newValue.text;
+                        text = text.replaceAll(RegExp(r'\s+'), ' ');
+                        text = text.trimLeft();
+                        return text == newValue.text
+                            ? newValue
+                            : TextEditingValue(
+                                text: text,
+                                selection: TextSelection.collapsed(
+                                  offset: text.length,
+                                ),
+                              );
+                      }),
+                      LengthLimitingTextInputFormatter(100),
+                    ],
+                    textCapitalization: TextCapitalization.words,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return widget.isToggled
+                            ? 'कृपया पता प्रविष्ट करें'
+                            : 'Please enter Address';
+                      }
+                      final trimmedValue = value.trim();
+                      if (RegExp(
+                        r'<.*?>|script|alert|on\w+=',
+                        caseSensitive: false,
+                      ).hasMatch(trimmedValue)) {
+                        return ValidationMessagesmortage.getMessage(
+                          'invalidCharacters',
+                          widget.isToggled,
+                        );
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _debtorNameController,
                     decoration: InputDecoration(
                       hintText:
-                          widget.isToggled ? 'देनदार का नाम' : 'Name Of Owner',
+                          widget.isToggled ? 'देनदार का नाम' : 'Name of Debtor',
                       hintStyle: AppFontStyle2.blinker(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -882,13 +955,15 @@ class _MortgageReportsState extends State<MortgageReports> {
                               "tbl_name": widget.tblName,
                               "customer_id": customerId,
                               "lead_id": widget.package_lead_id,
-                              "package_id": widget.packageId ??
-                                  "", // Send empty string if null
+                              "package_id": widget.packageId ?? "",
                               "state_id": stateId,
                               "city_id": SelectedId,
                               "taluka_id": selectedTalukaId,
                               "village_id": selectedVillageId,
                               "cts_no": _CTSNoController.text,
+                              "pincode": _pincodeController.text,
+                              "address": _addressController.text,
+                              "debtor_name": _debtorNameController.text,
                             };
                             submitInvestigativeReportForm(context, formData);
                           } else {

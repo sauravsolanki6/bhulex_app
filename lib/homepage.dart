@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart'
@@ -15,6 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'Core/apputility.dart';
+import 'E-Applications/aapli_chawadi_page.dart';
+import 'E-Applications/area_converter_page.dart';
+import 'E-Applications/e_property_valuation_page.dart';
 import 'My_package/package_details_new.dart';
 import 'Order/all_packages.dart';
 import 'Order/order_list.dart';
@@ -26,6 +30,7 @@ import 'controller/order/language controller.dart';
 import 'controller/package/getallpackagecontroller.dart' show PackageController;
 import 'controller/package/my_package_controller.dart';
 import 'customfiles/bottom_navigation_controller.dart';
+import 'investigate_reports_form/cersai_report.dart';
 import 'investigate_reports_form/mortage_report.dart';
 import 'investigate_reports_form/registered_document.dart';
 import 'investigate_reports_form/rera builder.dart';
@@ -33,9 +38,11 @@ import 'language/hindi.dart';
 import 'legal_advisory_forms/adhikar_abhilekh.dart';
 import 'legal_advisory_forms/courtcases.dart';
 import 'legal_advisory_forms/investigate.dart';
+import 'legal_advisory_forms/legal_drafts_new.dart';
 import 'legal_advisory_forms/legaldrafts.dart';
 import 'network/url.dart';
 import 'old_records_form/old extract1.dart';
+import 'old_records_form/old_revenue_records.dart';
 import 'profile/profile.dart';
 import 'quicke_services_forms/digitally_sign1.dart';
 import 'quicke_services_forms/digitally_sign_property_card.dart';
@@ -218,6 +225,7 @@ class _HomePage2State extends State<HomePage2> {
     setState(() {
       isLoading = true;
     });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? customerId = prefs.getString('customer_id');
     var requestBody = {
@@ -226,12 +234,21 @@ class _HomePage2State extends State<HomePage2> {
     };
 
     final String url = URLS().get_all_category_apiUrl;
+
+    // Print the request URL and body
+    print("Request URL: $url");
+    print("Request Body: ${jsonEncode(requestBody)}");
+
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json; charset=UTF-8'},
         body: jsonEncode(requestBody),
       );
+
+      // Print the raw response
+      print("Response Status Code: ${response.statusCode}");
+      log("Response Body of category: ${response.body}");
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -366,12 +383,13 @@ class _HomePage2State extends State<HomePage2> {
       child: Scaffold(
         backgroundColor: const Color(0xFFF8F8F8),
         appBar: AppBar(
+          scrolledUnderElevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           elevation: 0,
           title: Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Image.asset('assets/images/bhulex.png', height: 40),
+            padding: const EdgeInsets.only(top: 8.0, bottom: 10),
+            child: Image.asset('assets/images/bhulexlogo.png', height: 40),
           ),
           bottom: const PreferredSize(
             preferredSize: Size.fromHeight(1.0),
@@ -409,7 +427,7 @@ class _HomePage2State extends State<HomePage2> {
                         Obx(
                           () => !languageController.isToggled.value
                               ? const Positioned(
-                                  left: 10,
+                                  left: 15,
                                   child: Text(
                                     'A',
                                     style: TextStyle(
@@ -420,7 +438,8 @@ class _HomePage2State extends State<HomePage2> {
                                   ),
                                 )
                               : const Positioned(
-                                  right: 10,
+                                  top: 10,
+                                  right: 15,
                                   child: Text(
                                     'अ',
                                     style: TextStyle(
@@ -532,20 +551,25 @@ class _HomePage2State extends State<HomePage2> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(16.0),
-                            child: Obx(
-                              () => stateController.isLoading.value
-                                  ? const Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  : DropdownSearch<String>(
+                            child: Obx(() => stateController.isLoading.value
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : Obx(() {
+                                    final isSelected = stateController
+                                        .selectedStateName.value.isNotEmpty;
+                                    final borderColor = isSelected
+                                        ? Color(0xFFF26500)
+                                        : Color(0xFFD9D9D9);
+
+                                    return DropdownSearch<String>(
                                       items: stateController.states
                                           .map((state) => state.stateName)
                                           .toList(),
-                                      selectedItem: stateController
-                                              .selectedStateName.value.isEmpty
-                                          ? null
-                                          : stateController
-                                              .selectedStateName.value,
+                                      selectedItem: isSelected
+                                          ? stateController
+                                              .selectedStateName.value
+                                          : null,
                                       dropdownDecoratorProps:
                                           DropDownDecoratorProps(
                                         dropdownSearchDecoration:
@@ -567,32 +591,32 @@ class _HomePage2State extends State<HomePage2> {
                                           border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(6),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFD9D9D9),
+                                            borderSide: BorderSide(
+                                              color: borderColor,
                                               width: 1,
                                             ),
                                           ),
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(6),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFD9D9D9),
+                                            borderSide: BorderSide(
+                                              color: borderColor,
                                               width: 1,
                                             ),
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(6),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFD9D9D9),
+                                            borderSide: BorderSide(
+                                              color: borderColor,
                                               width: 1,
                                             ),
                                           ),
                                           disabledBorder: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(6),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFD9D9D9),
+                                            borderSide: BorderSide(
+                                              color: borderColor,
                                               width: 1,
                                             ),
                                           ),
@@ -610,8 +634,8 @@ class _HomePage2State extends State<HomePage2> {
                                       onChanged: (value) {
                                         stateController.setSelectedState(value);
                                       },
-                                    ),
-                            ),
+                                    );
+                                  })),
                           ),
                           ...categoryList.map((category) {
                             var services = category['service'] ?? [];
@@ -620,14 +644,15 @@ class _HomePage2State extends State<HomePage2> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Obx(
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Obx(
                                           () => Text(
                                             languageController.isToggled.value
                                                 ? (category[
@@ -637,24 +662,22 @@ class _HomePage2State extends State<HomePage2> {
                                                 : (category['category_name'] ??
                                                     ''),
                                             style: AppFontStyle2.blinker(
-                                              fontWeight: FontWeight.w500,
+                                              fontWeight: FontWeight.w600,
                                               fontSize: 16,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0),
-                                          child: Container(
-                                            height: 1,
-                                            color: const Color(0xFFD9D9D9),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Container(
+                                              height: 1,
+                                              color: const Color(0xFF757575),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Obx(
+                                        Obx(
                                           () => Text(
                                             LocalizationStringsinstant
                                                 .getString(
@@ -665,15 +688,15 @@ class _HomePage2State extends State<HomePage2> {
                                                   .isToggled.value,
                                             ),
                                             style: AppFontStyle2.blinker(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w400,
                                               color: Colorfile.lightgrey,
                                             ),
                                             textAlign: TextAlign.end,
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   const SizedBox(height: 10),
                                   GridView.builder(
@@ -824,7 +847,6 @@ class _HomePage2State extends State<HomePage2> {
                                               "tbl_old_seven_twelve",
                                               "tbl_old_eighta_extract",
                                               "tbl_old_e_mutation_extract",
-                                              "tbl_old_bhu_naksha",
                                             ].contains(tblName)) {
                                               Navigator.push(
                                                 context,
@@ -849,8 +871,32 @@ class _HomePage2State extends State<HomePage2> {
                                                 ),
                                               );
                                             } else if ([
+                                              "tbl_old_bhu_naksha",
+                                            ].contains(tblName)) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OldRevenueRecords(
+                                                    id: id,
+                                                    packageId: "",
+                                                    serviceName: serviceName,
+                                                    tblName: tblName,
+                                                    isToggled:
+                                                        languageController
+                                                            .isToggled.value,
+                                                    serviceNameInLocalLanguage:
+                                                        selectedService[
+                                                                'service_name_in_local_language'] ??
+                                                            serviceName,
+                                                    lead_id: '',
+                                                    customer_id: '',
+                                                    package_lead_id: '',
+                                                  ),
+                                                ),
+                                              );
+                                            } else if ([
                                               "tbl_mortage_report",
-                                              "tbl_ceersai_report",
                                             ].contains(tblName)) {
                                               Navigator.push(
                                                 context,
@@ -859,6 +905,33 @@ class _HomePage2State extends State<HomePage2> {
                                                     context,
                                                   ) =>
                                                       MortgageReports(
+                                                    id: id,
+                                                    packageId: "",
+                                                    serviceName: serviceName,
+                                                    tblName: tblName,
+                                                    isToggled:
+                                                        languageController
+                                                            .isToggled.value,
+                                                    serviceNameInLocalLanguage:
+                                                        selectedService[
+                                                                'service_name_in_local_language'] ??
+                                                            serviceName,
+                                                    lead_id: '',
+                                                    customer_id: '',
+                                                    package_lead_id: '',
+                                                  ),
+                                                ),
+                                              );
+                                            } else if ([
+                                              "tbl_ceersai_report",
+                                            ].contains(tblName)) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (
+                                                    context,
+                                                  ) =>
+                                                      CersaiReport(
                                                     id: id,
                                                     packageId: "",
                                                     serviceName: serviceName,
@@ -960,7 +1033,7 @@ class _HomePage2State extends State<HomePage2> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      Legaldrafts(
+                                                      LegalDraftsNew(
                                                     id: id,
                                                     packageId: "",
                                                     serviceName: serviceName,
@@ -1070,9 +1143,10 @@ class _HomePage2State extends State<HomePage2> {
                                               Text(
                                                 displayName,
                                                 style: AppFontStyle2.blinker(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colorfile.lightblack,
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w600,
+                                                  height: 12 / 9,
+                                                  color: Colorfile.servicename,
                                                 ),
                                                 textAlign: TextAlign.center,
                                                 maxLines: 2,
@@ -1088,6 +1162,250 @@ class _HomePage2State extends State<HomePage2> {
                               ),
                             );
                           }),
+                          // Dummy Category Section
+                          // Dummy Category Section
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Obx(
+                                        () => Text(
+                                          languageController.isToggled.value
+                                              ? dummyCategory[
+                                                  'category_name_in_local_language']
+                                              : dummyCategory['category_name'],
+                                          style: AppFontStyle2.blinker(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Container(
+                                            height: 1,
+                                            color: const Color(0xFF757575),
+                                          ),
+                                        ),
+                                      ),
+                                      Obx(
+                                        () => Text(
+                                          LocalizationStringsinstant.getString(
+                                            instantTextMap[dummyCategory[
+                                                    'category_name']] ??
+                                                '',
+                                            languageController.isToggled.value,
+                                          ),
+                                          style: AppFontStyle2.blinker(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colorfile.lightgrey,
+                                          ),
+                                          textAlign: TextAlign.end,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: dummyCategory['service'].length,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 4,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    childAspectRatio: 1.4,
+                                  ),
+                                  itemBuilder: (context, serviceIndex) {
+                                    var service =
+                                        dummyCategory['service'][serviceIndex];
+                                    String serviceIcon = service['icon'] ?? '';
+                                    return Obx(() {
+                                      String displayName = languageController
+                                              .isToggled.value
+                                          ? (service[
+                                                  'service_name_in_local_language'] ??
+                                              service['service_name'] ??
+                                              '')
+                                          : (service['service_name'] ?? '');
+                                      return InkWell(
+                                        onTap: () {
+                                          final id = service['id'].toString();
+                                          final serviceName =
+                                              service['service_name'] ?? '';
+                                          final tblName =
+                                              service['tbl_name'] ?? '';
+                                          final serviceNameInLocalLanguage =
+                                              service['service_name_in_local_language'] ??
+                                                  serviceName;
+
+                                          // Navigation logic based on tbl_name
+                                          switch (tblName) {
+                                            case "tbl_e_property_valuation":
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EPropertyValuationPage(
+                                                    id: id,
+                                                    packageId: "",
+                                                    serviceName: serviceName,
+                                                    tblName: tblName,
+                                                    isToggled:
+                                                        languageController
+                                                            .isToggled.value,
+                                                    serviceNameInLocalLanguage:
+                                                        serviceNameInLocalLanguage,
+                                                    lead_id: '',
+                                                    customer_id:
+                                                        widget.customer_id,
+                                                    package_lead_id: '',
+                                                  ),
+                                                ),
+                                              );
+                                              break;
+                                            case "tbl_aapli_chawadi":
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AapliChawadiPage(
+                                                    id: id,
+                                                    packageId: "",
+                                                    serviceName: serviceName,
+                                                    tblName: tblName,
+                                                    isToggled:
+                                                        languageController
+                                                            .isToggled.value,
+                                                    serviceNameInLocalLanguage:
+                                                        serviceNameInLocalLanguage,
+                                                    lead_id: '',
+                                                    customer_id:
+                                                        widget.customer_id,
+                                                    package_lead_id: '',
+                                                  ),
+                                                ),
+                                              );
+                                              break;
+                                            case "tbl_area_converter":
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      AreaConverterPage(
+                                                    id: id,
+                                                    packageId: "",
+                                                    serviceName: serviceName,
+                                                    tblName: tblName,
+                                                    isToggled:
+                                                        languageController
+                                                            .isToggled.value,
+                                                    serviceNameInLocalLanguage:
+                                                        serviceNameInLocalLanguage,
+                                                    lead_id: '',
+                                                    customer_id:
+                                                        widget.customer_id,
+                                                    package_lead_id: '',
+                                                  ),
+                                                ),
+                                              );
+                                              break;
+                                            case "tbl_property_mutation":
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      DigitallySign1(
+                                                    id: id,
+                                                    packageId: "",
+                                                    serviceName: serviceName,
+                                                    tblName: tblName,
+                                                    isToggled:
+                                                        languageController
+                                                            .isToggled.value,
+                                                    serviceNameInLocalLanguage:
+                                                        serviceNameInLocalLanguage,
+                                                    lead_id: '',
+                                                    customer_id:
+                                                        widget.customer_id,
+                                                    package_lead_id: '',
+                                                  ),
+                                                ),
+                                              );
+                                              break;
+                                            default:
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Obx(
+                                                    () => Text(
+                                                      languageController
+                                                              .isToggled.value
+                                                          ? "या निवडीसाठी सेवा उपलब्ध नाही."
+                                                          : "Service not available for this selection.",
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                          }
+                                        },
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            serviceIcon.isNotEmpty
+                                                ? Image.asset(
+                                                    serviceIcon,
+                                                    height: 25,
+                                                    width: 25,
+                                                    fit: BoxFit.contain,
+                                                    errorBuilder:
+                                                        (ctx, _, __) =>
+                                                            const Icon(
+                                                      Icons.broken_image,
+                                                      size: 25,
+                                                    ),
+                                                  )
+                                                : const Icon(
+                                                    Icons
+                                                        .miscellaneous_services,
+                                                    size: 30,
+                                                  ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              displayName,
+                                              style: AppFontStyle2.blinker(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w600,
+                                                height: 12 / 9,
+                                                color: Colorfile.servicename,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -1103,7 +1421,7 @@ class _HomePage2State extends State<HomePage2> {
                                         : 'Packages',
                                     style: AppFontStyle2.blinker(
                                       fontSize: 18,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w600,
                                       color: Colorfile.lightblack,
                                     ),
                                   ),
@@ -1222,7 +1540,7 @@ class _HomePage2State extends State<HomePage2> {
                                                       BorderRadius.circular(10),
                                                   border: Border.all(
                                                     color: const Color(
-                                                      0xFFDFE6F8,
+                                                      0xFFE5E7EB,
                                                     ),
                                                     width: 0.5,
                                                   ),
@@ -1577,6 +1895,34 @@ class _HomePage2State extends State<HomePage2> {
     );
   }
 }
+
+final Map<String, dynamic> dummyCategory = {
+  "category_name": "E-Application",
+  "category_name_in_local_language": "मालमत्ता सेवा",
+  "service": [
+    {
+      "id": "1",
+      "service_name": "E-Property Valuation",
+      "service_name_in_local_language": "ई-मालमत्ता मूल्यांकन",
+      "icon": "assets/images/valuation.png",
+      "tbl_name": "tbl_e_property_valuation"
+    },
+    {
+      "id": "2",
+      "service_name": "Aapli Chawadi",
+      "service_name_in_local_language": "आपली चावडी",
+      "icon": "assets/images/chawadi.png",
+      "tbl_name": "tbl_aapli_chawadi"
+    },
+    {
+      "id": "3",
+      "service_name": "Area Converter",
+      "service_name_in_local_language": "क्षेत्र परिवर्तक",
+      "icon": "assets/images/area_converter.png",
+      "tbl_name": "tbl_area_converter"
+    }
+  ]
+};
 
 class LocalizationStringsinstant {
   static String getString(String key, bool isToggled) {

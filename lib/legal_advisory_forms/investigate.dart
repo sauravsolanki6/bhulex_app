@@ -7,10 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
-
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Core/AppImages.dart';
 import '../My_package/package_order_details.dart';
+import '../colors/custom_color.dart';
 import '../colors/fonts.dart' show AppTextStyles;
 import '../colors/order_fonts.dart';
 import '../form_internet.dart';
@@ -23,8 +24,8 @@ class Investigation extends StatefulWidget {
   final String id;
   final String serviceName;
   final String tblName;
-  final bool isToggled; // Added for language toggle
-  final String serviceNameInLocalLanguage; // Added for local service name
+  final bool isToggled;
+  final String serviceNameInLocalLanguage;
   final String packageId;
   final String lead_id;
   final String customer_id;
@@ -61,13 +62,12 @@ class _InvestigationState extends State<Investigation> {
   String? selectedTalukaId;
   final _formKey = GlobalKey<FormState>();
   bool isLoading = true;
-  final NetworkChecker _networkChecker = NetworkChecker(); // Add NetworkChecker
+  final NetworkChecker _networkChecker = NetworkChecker();
 
   @override
   void initState() {
     super.initState();
-    _networkChecker.startMonitoring(context); // Start network monitoring
-
+    _networkChecker.startMonitoring(context);
     _fetchCity();
   }
 
@@ -89,7 +89,6 @@ class _InvestigationState extends State<Investigation> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print("Form submitted successfully: $responseData");
-        // Check if packageId is empty
         if (widget.packageId == "") {
           Navigator.pushReplacement(
             context,
@@ -101,13 +100,12 @@ class _InvestigationState extends State<Investigation> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder:
-                  (context) => PackageService(
-                    package_Id: widget.packageId,
-                    lead_id: widget.lead_id,
-                    customerid: widget.customer_id,
-                    tbl_name: '',
-                  ),
+              builder: (context) => PackageService(
+                package_Id: widget.packageId,
+                lead_id: widget.lead_id,
+                customerid: widget.customer_id,
+                tbl_name: '',
+              ),
             ),
           );
         }
@@ -135,7 +133,6 @@ class _InvestigationState extends State<Investigation> {
     final String url = URLS().get_all_city_apiUrl;
     log('City URL: $url');
 
-    // Fetch state_id from SharedPreferences and set it to "22" for testing
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('state_id', '22');
     log('state_id 22 saved to SharedPreferences');
@@ -264,10 +261,9 @@ class _InvestigationState extends State<Investigation> {
 
   @override
   Widget build(BuildContext context) {
-    String displayServiceName =
-        widget.isToggled
-            ? widget.serviceNameInLocalLanguage
-            : widget.serviceName;
+    String displayServiceName = widget.isToggled
+        ? widget.serviceNameInLocalLanguage
+        : widget.serviceName;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
@@ -369,15 +365,6 @@ class _InvestigationState extends State<Investigation> {
                           widget.isToggled,
                         );
                       }
-                      // if (!RegExp(
-                      //   r'^[\p{L}\s]+$',
-                      //   unicode: true,
-                      // ).hasMatch(trimmedValue)) {
-                      //   return ValidationMessagesseventweleve.getMessage(
-                      //     'onlyAlphabetsAllowed',
-                      //     widget.isToggled,
-                      //   );
-                      // }
                       return null;
                     },
                     builder: (FormFieldState<String> state) {
@@ -385,13 +372,12 @@ class _InvestigationState extends State<Investigation> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownSearch<String>(
-                            items:
-                                CityData.map<String>((item) {
-                                  return widget.isToggled
-                                      ? (item['city_name_in_local_language'])
-                                          .toString()
-                                      : (item['city_name']).toString();
-                                }).toList(),
+                            items: CityData.map<String>((item) {
+                              return widget.isToggled
+                                  ? (item['city_name_in_local_language'])
+                                      .toString()
+                                  : (item['city_name']).toString();
+                            }).toList(),
                             selectedItem: Selectedcity,
                             dropdownDecoratorProps: DropDownDecoratorProps(
                               dropdownSearchDecoration: InputDecoration(
@@ -415,7 +401,20 @@ class _InvestigationState extends State<Investigation> {
                                     color: Color(0xFFC5C5C5),
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
                                 errorText: state.errorText,
+                                errorStyle: AppTextStyles.error(),
                               ),
                             ),
                             popupProps: PopupProps.menu(
@@ -431,12 +430,10 @@ class _InvestigationState extends State<Investigation> {
                                   LengthLimitingTextInputFormatter(50),
                                 ],
                                 decoration: InputDecoration(
-                                  hintText:
-                                      widget.isToggled
-                                          ? 'जिल्हा शोधा...'
-                                          : 'Search District...',
+                                  hintText: widget.isToggled
+                                      ? 'जिल्हा शोधा...'
+                                      : 'Search District...',
                                   hintStyle: AppTextStyles.hint(),
-
                                   border: const OutlineInputBorder(),
                                 ),
                               ),
@@ -456,16 +453,16 @@ class _InvestigationState extends State<Investigation> {
                                 final matchedCity = CityData.firstWhere(
                                   (element) =>
                                       (widget.isToggled
-                                          ? (element['city_name_in_local_language'])
+                                          ? (element[
+                                              'city_name_in_local_language'])
                                           : element['city_name']) ==
                                       value,
                                   orElse: () => {},
                                 );
 
-                                SelectedId =
-                                    matchedCity.isNotEmpty
-                                        ? matchedCity['id'].toString()
-                                        : null;
+                                SelectedId = matchedCity.isNotEmpty
+                                    ? matchedCity['id'].toString()
+                                    : null;
 
                                 if (SelectedId != null) {
                                   _fetchTaluka(SelectedId!);
@@ -499,15 +496,6 @@ class _InvestigationState extends State<Investigation> {
                           widget.isToggled,
                         );
                       }
-                      // if (!RegExp(
-                      //   r'^[\p{L}\s]+$',
-                      //   unicode: true,
-                      // ).hasMatch(trimmedValue)) {
-                      //   return ValidationMessagesinvestigate.getMessage(
-                      //     'onlyAlphabetsAllowed',
-                      //     widget.isToggled,
-                      //   );
-                      // }
                       return null;
                     },
                     builder: (FormFieldState<String> state) {
@@ -515,15 +503,14 @@ class _InvestigationState extends State<Investigation> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownSearch<String>(
-                            items:
-                                talukaData.map<String>((item) {
-                                  return widget.isToggled
-                                      ? (item['taluka_name_in_local_language'] ??
-                                              item['taluka_name'] ??
-                                              '')
-                                          .toString()
-                                      : (item['taluka_name'] ?? '').toString();
-                                }).toList(),
+                            items: talukaData.map<String>((item) {
+                              return widget.isToggled
+                                  ? (item['taluka_name_in_local_language'] ??
+                                          item['taluka_name'] ??
+                                          '')
+                                      .toString()
+                                  : (item['taluka_name'] ?? '').toString();
+                            }).toList(),
                             selectedItem: selectedTaluka,
                             dropdownDecoratorProps: DropDownDecoratorProps(
                               dropdownSearchDecoration: InputDecoration(
@@ -531,7 +518,7 @@ class _InvestigationState extends State<Investigation> {
                                   'taluka',
                                   widget.isToggled,
                                 ),
-                                hintStyle: AppFontStyle.poppins(
+                                hintStyle: AppFontStyle2.blinker(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   height: 1.57,
@@ -547,7 +534,20 @@ class _InvestigationState extends State<Investigation> {
                                     color: Color(0xFFC5C5C5),
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
                                 errorText: state.errorText,
+                                errorStyle: AppTextStyles.error(),
                               ),
                             ),
                             popupProps: PopupProps.menu(
@@ -563,12 +563,10 @@ class _InvestigationState extends State<Investigation> {
                                   LengthLimitingTextInputFormatter(50),
                                 ],
                                 decoration: InputDecoration(
-                                  hintText:
-                                      widget.isToggled
-                                          ? 'तालुका शोधा...'
-                                          : 'Search Taluka...',
+                                  hintText: widget.isToggled
+                                      ? 'तालुका शोधा...'
+                                      : 'Search Taluka...',
                                   hintStyle: AppFontStyle2.blinker(),
-
                                   border: const OutlineInputBorder(),
                                 ),
                               ),
@@ -587,17 +585,17 @@ class _InvestigationState extends State<Investigation> {
                                 final matchedTaluka = talukaData.firstWhere(
                                   (element) =>
                                       (widget.isToggled
-                                          ? (element['taluka_name_in_local_language'] ??
+                                          ? (element[
+                                                  'taluka_name_in_local_language'] ??
                                               element['taluka_name'])
                                           : element['taluka_name']) ==
                                       value,
                                   orElse: () => {},
                                 );
 
-                                selectedTalukaId =
-                                    matchedTaluka.isNotEmpty
-                                        ? matchedTaluka['id'].toString()
-                                        : null;
+                                selectedTalukaId = matchedTaluka.isNotEmpty
+                                    ? matchedTaluka['id'].toString()
+                                    : null;
 
                                 if (selectedTalukaId != null) {
                                   _fetchVillages(
@@ -634,15 +632,6 @@ class _InvestigationState extends State<Investigation> {
                           widget.isToggled,
                         );
                       }
-                      // if (!RegExp(
-                      //   r'^[\p{L}\s]+$',
-                      //   unicode: true,
-                      // ).hasMatch(trimmedValue)) {
-                      //   return ValidationMessagesinvestigate.getMessage(
-                      //     'onlyAlphabetsAllowed',
-                      //     widget.isToggled,
-                      //   );
-                      // }
                       return null;
                     },
                     builder: (FormFieldState<String> state) {
@@ -650,22 +639,20 @@ class _InvestigationState extends State<Investigation> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownSearch<String>(
-                            items:
-                                villageData
-                                    .map<String>((item) {
-                                      final villageName =
-                                          widget.isToggled
-                                              ? (item['village_name_in_local_language'] ??
-                                                  item['village_name'])
-                                              : item['village_name'];
-                                      return villageName?.toString() ?? '';
-                                    })
-                                    .where(
-                                      (name) =>
-                                          name.trim().isNotEmpty &&
-                                          name.toLowerCase() != 'null',
-                                    )
-                                    .toList(),
+                            items: villageData
+                                .map<String>((item) {
+                                  final villageName = widget.isToggled
+                                      ? (item['village_name_in_local_language'] ??
+                                          item['village_name'])
+                                      : item['village_name'];
+                                  return villageName?.toString() ?? '';
+                                })
+                                .where(
+                                  (name) =>
+                                      name.trim().isNotEmpty &&
+                                      name.toLowerCase() != 'null',
+                                )
+                                .toList(),
                             selectedItem: selectedVillageName,
                             dropdownDecoratorProps: DropDownDecoratorProps(
                               dropdownSearchDecoration: InputDecoration(
@@ -689,7 +676,20 @@ class _InvestigationState extends State<Investigation> {
                                     color: Color(0xFFC5C5C5),
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
                                 errorText: state.errorText,
+                                errorStyle: AppTextStyles.error(),
                               ),
                             ),
                             popupProps: PopupProps.menu(
@@ -705,12 +705,10 @@ class _InvestigationState extends State<Investigation> {
                                   LengthLimitingTextInputFormatter(50),
                                 ],
                                 decoration: InputDecoration(
-                                  hintText:
-                                      widget.isToggled
-                                          ? 'गाव शोधा...'
-                                          : 'Search Village...',
+                                  hintText: widget.isToggled
+                                      ? 'गाव शोधा...'
+                                      : 'Search Village...',
                                   hintStyle: AppFontStyle2.blinker(),
-
                                   border: const OutlineInputBorder(),
                                 ),
                               ),
@@ -729,17 +727,17 @@ class _InvestigationState extends State<Investigation> {
                                 final matchedVillage = villageData.firstWhere(
                                   (element) =>
                                       (widget.isToggled
-                                          ? (element['village_name_in_local_language'] ??
+                                          ? (element[
+                                                  'village_name_in_local_language'] ??
                                               element['village_name'])
                                           : element['village_name']) ==
                                       value,
                                   orElse: () => {},
                                 );
 
-                                selectedVillageId =
-                                    matchedVillage.isNotEmpty
-                                        ? matchedVillage['id'].toString()
-                                        : null;
+                                selectedVillageId = matchedVillage.isNotEmpty
+                                    ? matchedVillage['id'].toString()
+                                    : null;
 
                                 state.didChange(value);
                               });
@@ -765,6 +763,7 @@ class _InvestigationState extends State<Investigation> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
@@ -774,6 +773,7 @@ class _InvestigationState extends State<Investigation> {
                         borderRadius: BorderRadius.circular(6),
                         borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
+                      errorStyle: AppTextStyles.error(),
                     ),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(
@@ -781,19 +781,16 @@ class _InvestigationState extends State<Investigation> {
                       ),
                       TextInputFormatter.withFunction((oldValue, newValue) {
                         String text = newValue.text;
-                        // Replace multiple spaces with single space
                         text = text.replaceAll(RegExp(r'\s+'), ' ');
-                        // Remove leading space
                         text = text.trimLeft();
-
                         return text == newValue.text
                             ? newValue
                             : TextEditingValue(
-                              text: text,
-                              selection: TextSelection.collapsed(
-                                offset: text.length,
-                              ),
-                            );
+                                text: text,
+                                selection: TextSelection.collapsed(
+                                  offset: text.length,
+                                ),
+                              );
                       }),
                       LengthLimitingTextInputFormatter(50),
                     ],
@@ -834,30 +831,21 @@ class _InvestigationState extends State<Investigation> {
                             height: 1.57,
                             color: const Color(0xFF36322E),
                           ),
-                          children: [
-                            TextSpan(
-                              text:
-                                  ' ${InvestigationStrings.getString('byNameHint', widget.isToggled)}',
-                              style: AppFontStyle2.blinker(
-                                color: Color(0xFF36322E),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFD9D9D9)),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFD9D9D9)),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
+                      errorStyle: AppTextStyles.error(),
                     ),
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(
@@ -865,19 +853,16 @@ class _InvestigationState extends State<Investigation> {
                       ),
                       TextInputFormatter.withFunction((oldValue, newValue) {
                         String text = newValue.text;
-                        // Replace multiple spaces with single space
                         text = text.replaceAll(RegExp(r'\s+'), ' ');
-                        // Remove leading space
                         text = text.trimLeft();
-
                         return text == newValue.text
                             ? newValue
                             : TextEditingValue(
-                              text: text,
-                              selection: TextSelection.collapsed(
-                                offset: text.length,
-                              ),
-                            );
+                                text: text,
+                                selection: TextSelection.collapsed(
+                                  offset: text.length,
+                                ),
+                              );
                       }),
                       LengthLimitingTextInputFormatter(50),
                     ],
@@ -899,16 +884,7 @@ class _InvestigationState extends State<Investigation> {
                           widget.isToggled,
                         );
                       }
-                      // if (!RegExp(
-                      //   r'^[\p{L}\s]+$',
-                      //   unicode: true,
-                      // ).hasMatch(trimmedValue)) {
-                      //   return ValidationMessagesinvestigate.getMessage(
-                      //     'onlyAlphabetsAllowed',
-                      //     widget.isToggled,
-                      //   );
-                      // }
-                      // return null;
+                      return null;
                     },
                   ),
                   Padding(
@@ -917,7 +893,7 @@ class _InvestigationState extends State<Investigation> {
                       width: double.infinity,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF57C03),
+                        color: const Color(0xFFF26500),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: TextButton(
@@ -934,17 +910,15 @@ class _InvestigationState extends State<Investigation> {
                               "tbl_name": widget.tblName,
                               "customer_id": customerId,
                               "lead_id": widget.package_lead_id,
-                              "package_id":
-                                  widget.packageId ??
-                                  "", // Send empty string if null
+                              "package_id": widget.packageId ?? "",
                               "state_id": stateId,
                               "city_id": SelectedId,
                               "taluka_id": selectedTalukaId,
                               "village_id": selectedVillageId,
                               "cts_no": _CTSNoController.text.trim(),
-                              "name":
-                                  _ByNameIncasesurveynoisnotknownController.text
-                                      .trim(),
+                              "name": _ByNameIncasesurveynoisnotknownController
+                                  .text
+                                  .trim(),
                             };
                             submitLegalAdvisoryEnquiryForm(context, formData);
                           } else {
@@ -965,6 +939,81 @@ class _InvestigationState extends State<Investigation> {
                           ),
                         ),
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colorfile.borderDark,
+                              ),
+                              color: Colorfile.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                print("View Sample button pressed");
+                              },
+                              child: Center(
+                                child: Text(
+                                  LocalizedStrings.getString(
+                                    'viewSample',
+                                    widget.isToggled,
+                                  ),
+                                  style: AppFontStyle2.blinker(
+                                    color: Colorfile.lightblack,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colorfile.lightwhite,
+                              ),
+                              color: Colorfile.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                print("Chat with Us button pressed");
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    AppImages.whatsapp,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    LocalizedStrings.getString(
+                                      'chatWithUs',
+                                      widget.isToggled,
+                                    ),
+                                    style: AppFontStyle2.blinker(
+                                      color: Colorfile.lightblack,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

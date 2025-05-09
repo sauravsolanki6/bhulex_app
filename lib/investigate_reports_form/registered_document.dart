@@ -4,12 +4,13 @@ import 'dart:developer';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Core/AppImages.dart';
 import '../My_package/package_order_details.dart';
+import '../colors/custom_color.dart';
 import '../colors/fonts.dart';
 import '../colors/order_fonts.dart';
 import '../form_internet.dart' show NetworkChecker;
@@ -51,7 +52,6 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
   final TextEditingController _ByNameIncasesurveynoisnotknownController =
       TextEditingController();
   final TextEditingController _CTSNoController = TextEditingController();
-  final TextEditingController _documentController = TextEditingController();
 
   String? Selectedcity;
   String? SelectedId;
@@ -62,15 +62,24 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
   String? selectedVillageName;
   String? selectedVillageId;
   String? selectedTalukaId;
+  String? selectedDocumentType;
   final _formKey = GlobalKey<FormState>();
   bool isLoading = true;
-  final NetworkChecker _networkChecker = NetworkChecker(); // Add NetworkChecker
+  final NetworkChecker _networkChecker = NetworkChecker();
+
+  final List<String> documentTypes = [
+    'Sale Deed',
+    'Gift Deed',
+    'Will',
+    'Lease Agreement',
+    'Power of Attorney',
+    'Mortgage Deed',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _networkChecker.startMonitoring(context); // Start network monitoring
-
+    _networkChecker.startMonitoring(context);
     _fetchCity();
   }
 
@@ -106,13 +115,12 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder:
-                  (context) => PackageService(
-                    package_Id: widget.packageId,
-                    lead_id: widget.lead_id,
-                    customerid: widget.customer_id,
-                    tbl_name: '',
-                  ),
+              builder: (context) => PackageService(
+                package_Id: widget.packageId,
+                lead_id: widget.lead_id,
+                customerid: widget.customer_id,
+                tbl_name: '',
+              ),
             ),
           );
         }
@@ -262,18 +270,17 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
       Selectedcity = null;
       selectedVillageName = null;
       selectedTaluka = null;
+      selectedDocumentType = null;
       _CTSNoController.clear();
-      _documentController.clear();
       _ByNameIncasesurveynoisnotknownController.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    String displayServiceName =
-        widget.isToggled
-            ? widget.serviceNameInLocalLanguage
-            : widget.serviceName;
+    String displayServiceName = widget.isToggled
+        ? widget.serviceNameInLocalLanguage
+        : widget.serviceName;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
@@ -294,9 +301,8 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder:
-                    (context) =>
-                        const HomePage2(customer_id: '', customerId: ''),
+                builder: (context) =>
+                    const HomePage2(customer_id: '', customerId: ''),
               ),
             );
           },
@@ -318,6 +324,35 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.00,
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0x40F57C03),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          width: 0.5,
+                          color: const Color(0xFFFCCACA),
+                        ),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(14, 14, 18, 14),
+                      child: Text(
+                        RegisteredDocumentStrings.getString(
+                          'note',
+                          widget.isToggled,
+                        ),
+                        style: AppFontStyle2.blinker(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF36322E),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
                     RegisteredDocumentStrings.getString(
                       'pleaseEnterYourDetails',
@@ -358,13 +393,12 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownSearch<String>(
-                            items:
-                                CityData.map<String>((item) {
-                                  return widget.isToggled
-                                      ? (item['city_name_in_local_language'])
-                                          .toString()
-                                      : (item['city_name']).toString();
-                                }).toList(),
+                            items: CityData.map<String>((item) {
+                              return widget.isToggled
+                                  ? (item['city_name_in_local_language'])
+                                      .toString()
+                                  : (item['city_name']).toString();
+                            }).toList(),
                             selectedItem: Selectedcity,
                             dropdownDecoratorProps: DropDownDecoratorProps(
                               dropdownSearchDecoration: InputDecoration(
@@ -388,6 +422,18 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                     color: Color(0xFFC5C5C5),
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
                                 errorText: state.errorText,
                                 errorStyle: AppTextStyles.error(),
                               ),
@@ -405,10 +451,9 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                   LengthLimitingTextInputFormatter(50),
                                 ],
                                 decoration: InputDecoration(
-                                  hintText:
-                                      widget.isToggled
-                                          ? 'जिल्हा शोधा...'
-                                          : 'Search District...',
+                                  hintText: widget.isToggled
+                                      ? 'जिल्हा शोधा...'
+                                      : 'Search District...',
                                   hintStyle: AppFontStyle2.blinker(),
                                   border: const OutlineInputBorder(),
                                 ),
@@ -429,16 +474,16 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                 final matchedCity = CityData.firstWhere(
                                   (element) =>
                                       (widget.isToggled
-                                          ? (element['city_name_in_local_language'])
+                                          ? (element[
+                                              'city_name_in_local_language'])
                                           : element['city_name']) ==
                                       value,
                                   orElse: () => {},
                                 );
 
-                                SelectedId =
-                                    matchedCity.isNotEmpty
-                                        ? matchedCity['id'].toString()
-                                        : null;
+                                SelectedId = matchedCity.isNotEmpty
+                                    ? matchedCity['id'].toString()
+                                    : null;
 
                                 if (SelectedId != null) {
                                   _fetchTaluka(SelectedId!);
@@ -479,15 +524,14 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownSearch<String>(
-                            items:
-                                talukaData.map<String>((item) {
-                                  return widget.isToggled
-                                      ? (item['taluka_name_in_local_language'] ??
-                                              item['taluka_name'] ??
-                                              '')
-                                          .toString()
-                                      : (item['taluka_name'] ?? '').toString();
-                                }).toList(),
+                            items: talukaData.map<String>((item) {
+                              return widget.isToggled
+                                  ? (item['taluka_name_in_local_language'] ??
+                                          item['taluka_name'] ??
+                                          '')
+                                      .toString()
+                                  : (item['taluka_name'] ?? '').toString();
+                            }).toList(),
                             selectedItem: selectedTaluka,
                             dropdownDecoratorProps: DropDownDecoratorProps(
                               dropdownSearchDecoration: InputDecoration(
@@ -511,7 +555,20 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                     color: Color(0xFFC5C5C5),
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
                                 errorText: state.errorText,
+                                errorStyle: AppTextStyles.error(),
                               ),
                             ),
                             popupProps: PopupProps.menu(
@@ -527,10 +584,9 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                   LengthLimitingTextInputFormatter(50),
                                 ],
                                 decoration: InputDecoration(
-                                  hintText:
-                                      widget.isToggled
-                                          ? 'तालुका शोधा...'
-                                          : 'Search Taluka...',
+                                  hintText: widget.isToggled
+                                      ? 'तालुका शोधा...'
+                                      : 'Search Taluka...',
                                   hintStyle: AppFontStyle2.blinker(),
                                   border: const OutlineInputBorder(),
                                 ),
@@ -550,17 +606,17 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                 final matchedTaluka = talukaData.firstWhere(
                                   (element) =>
                                       (widget.isToggled
-                                          ? (element['taluka_name_in_local_language'] ??
+                                          ? (element[
+                                                  'taluka_name_in_local_language'] ??
                                               element['taluka_name'])
                                           : element['taluka_name']) ==
                                       value,
                                   orElse: () => {},
                                 );
 
-                                selectedTalukaId =
-                                    matchedTaluka.isNotEmpty
-                                        ? matchedTaluka['id'].toString()
-                                        : null;
+                                selectedTalukaId = matchedTaluka.isNotEmpty
+                                    ? matchedTaluka['id'].toString()
+                                    : null;
 
                                 if (selectedTalukaId != null) {
                                   _fetchVillages(
@@ -604,15 +660,14 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           DropdownSearch<String>(
-                            items:
-                                villageData.map<String>((item) {
-                                  return widget.isToggled
-                                      ? (item['village_name_in_local_language'] ??
-                                              item['village_name'] ??
-                                              '')
-                                          .toString()
-                                      : (item['village_name'] ?? '').toString();
-                                }).toList(),
+                            items: villageData.map<String>((item) {
+                              return widget.isToggled
+                                  ? (item['village_name_in_local_language'] ??
+                                          item['village_name'] ??
+                                          '')
+                                      .toString()
+                                  : (item['village_name'] ?? '').toString();
+                            }).toList(),
                             selectedItem: selectedVillageName,
                             dropdownDecoratorProps: DropDownDecoratorProps(
                               dropdownSearchDecoration: InputDecoration(
@@ -636,7 +691,20 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                     color: Color(0xFFC5C5C5),
                                   ),
                                 ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
                                 errorText: state.errorText,
+                                errorStyle: AppTextStyles.error(),
                               ),
                             ),
                             popupProps: PopupProps.menu(
@@ -652,10 +720,9 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                   LengthLimitingTextInputFormatter(50),
                                 ],
                                 decoration: InputDecoration(
-                                  hintText:
-                                      widget.isToggled
-                                          ? 'गाव शोधा...'
-                                          : 'Search Village...',
+                                  hintText: widget.isToggled
+                                      ? 'गाव शोधा...'
+                                      : 'Search Village...',
                                   hintStyle: AppFontStyle2.blinker(),
                                   border: const OutlineInputBorder(),
                                 ),
@@ -675,17 +742,17 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                                 final matchedVillage = villageData.firstWhere(
                                   (element) =>
                                       (widget.isToggled
-                                          ? (element['village_name_in_local_language'] ??
+                                          ? (element[
+                                                  'village_name_in_local_language'] ??
                                               element['village_name'])
                                           : element['village_name']) ==
                                       value,
                                   orElse: () => {},
                                 );
 
-                                selectedVillageId =
-                                    matchedVillage.isNotEmpty
-                                        ? matchedVillage['id'].toString()
-                                        : null;
+                                selectedVillageId = matchedVillage.isNotEmpty
+                                    ? matchedVillage['id'].toString()
+                                    : null;
 
                                 state.didChange(value);
                               });
@@ -704,13 +771,14 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                         widget.isToggled,
                       ),
                       hintStyle: AppFontStyle2.blinker(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                         height: 1.57,
                         color: const Color(0xFF36322E),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
@@ -733,11 +801,11 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                         return text == newValue.text
                             ? newValue
                             : TextEditingValue(
-                              text: text,
-                              selection: TextSelection.collapsed(
-                                offset: text.length,
-                              ),
-                            );
+                                text: text,
+                                selection: TextSelection.collapsed(
+                                  offset: text.length,
+                                ),
+                              );
                       }),
                       LengthLimitingTextInputFormatter(50),
                     ],
@@ -774,7 +842,7 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                           ),
                           style: const TextStyle(
                             color: Color(0xFF36322E),
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
                           children: [
@@ -792,14 +860,15 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFD9D9D9)),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFD9D9D9)),
+                        borderSide: const BorderSide(color: Color(0xFFC5C5C5)),
                       ),
                       errorStyle: AppTextStyles.error(),
                     ),
@@ -814,11 +883,11 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                         return text == newValue.text
                             ? newValue
                             : TextEditingValue(
-                              text: text,
-                              selection: TextSelection.collapsed(
-                                offset: text.length,
-                              ),
-                            );
+                                text: text,
+                                selection: TextSelection.collapsed(
+                                  offset: text.length,
+                                ),
+                              );
                       }),
                       LengthLimitingTextInputFormatter(50),
                     ],
@@ -844,62 +913,16 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _documentController,
-                    decoration: InputDecoration(
-                      label: RichText(
-                        text: TextSpan(
-                          text: RegisteredDocumentStrings.getString(
-                            'typeOfDocument',
-                            widget.isToggled,
-                          ),
-                          style: AppFontStyle2.blinker(
-                            color: Color(0xFF36322E),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFD9D9D9)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFFD9D9D9)),
-                      ),
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                        RegExp(r'^[\u0900-\u097F\u0966-\u096F a-zA-Z0-9\s/]+$'),
-                      ),
-                      TextInputFormatter.withFunction((oldValue, newValue) {
-                        String text = newValue.text;
-                        text = text.replaceAll(RegExp(r'\s+'), ' ');
-                        text = text.trimLeft();
-                        return text == newValue.text
-                            ? newValue
-                            : TextEditingValue(
-                              text: text,
-                              selection: TextSelection.collapsed(
-                                offset: text.length,
-                              ),
-                            );
-                      }),
-                      LengthLimitingTextInputFormatter(50),
-                    ],
-                    textCapitalization: TextCapitalization.words,
+                  FormField<String>(
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
+                      if (selectedDocumentType == null ||
+                          selectedDocumentType!.trim().isEmpty) {
                         return ValidationMessagesregisterdocument.getMessage(
                           'pleaseEnterDocumentName',
                           widget.isToggled,
                         );
                       }
-                      final trimmedValue = value.trim();
+                      final trimmedValue = selectedDocumentType!.trim();
                       if (RegExp(
                         r'<.*?>|script|alert|on\w+=',
                         caseSensitive: false,
@@ -911,6 +934,88 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                       }
                       return null;
                     },
+                    builder: (FormFieldState<String> state) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          DropdownSearch<String>(
+                            items: documentTypes,
+                            selectedItem: selectedDocumentType,
+                            dropdownDecoratorProps: DropDownDecoratorProps(
+                              dropdownSearchDecoration: InputDecoration(
+                                labelText: RegisteredDocumentStrings.getString(
+                                  'typeOfDocument',
+                                  widget.isToggled,
+                                ),
+                                labelStyle: AppFontStyle2.blinker(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xFF36322E),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 14,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFC5C5C5),
+                                  ),
+                                ),
+                                errorText: state.errorText,
+                                errorStyle: AppTextStyles.error(),
+                              ),
+                            ),
+                            popupProps: PopupProps.menu(
+                              showSearchBox: true,
+                              searchFieldProps: TextFieldProps(
+                                textCapitalization: TextCapitalization.words,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(
+                                      r'^[a-zA-Z\s]+$',
+                                    ),
+                                  ),
+                                  LengthLimitingTextInputFormatter(50),
+                                ],
+                                decoration: InputDecoration(
+                                  hintText: widget.isToggled
+                                      ? 'दस्तऐवजाचा प्रकार शोधा...'
+                                      : 'Search Document Type...',
+                                  hintStyle: AppFontStyle2.blinker(),
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            dropdownButtonProps: DropdownButtonProps(
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 28,
+                                color: Color(0xFF9CA3AF),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedDocumentType = value;
+                                state.didChange(value);
+                              });
+                            },
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 55.0),
@@ -918,7 +1023,7 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                       width: double.infinity,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF57C03),
+                        color: const Color(0xFFF26500),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: TextButton(
@@ -927,9 +1032,8 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                             SharedPreferences prefs =
                                 await SharedPreferences.getInstance();
                             final String? stateId = prefs.getString('state_id');
-                            final String? customerId = prefs.getString(
-                              'customer_id',
-                            );
+                            final String? customerId =
+                                prefs.getString('customer_id');
 
                             Map<String, dynamic> formData = {
                               "tbl_name": widget.tblName,
@@ -940,14 +1044,14 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                               "taluka_id": selectedTalukaId,
                               "village_id": selectedVillageId,
                               "cts_no": _CTSNoController.text,
-                              "name":
-                                  _ByNameIncasesurveynoisnotknownController
-                                      .text,
-                              "documents": _documentController.text,
-                              "customer_id":
-                                  customerId ??
-                                  widget.customer_id, // Added customer_id
+                              "name": _ByNameIncasesurveynoisnotknownController
+                                  .text,
+                              "documents": selectedDocumentType,
+                              "customer_id": customerId ?? widget.customer_id,
                             };
+
+                            await submitInvestigativeReportForm(
+                                context, formData);
                           }
                         },
                         child: Center(
@@ -966,33 +1070,79 @@ class _RegisteredDocumentState extends State<RegisteredDocument> {
                       ),
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.25),
                   Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.00,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0x40F57C03),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          width: 0.5,
-                          color: const Color(0xFFFCCACA),
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colorfile.borderDark,
+                              ),
+                              color: Colorfile.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                print("View Sample button pressed");
+                              },
+                              child: Center(
+                                child: Text(
+                                  LocalizedStrings.getString(
+                                    'viewSample',
+                                    widget.isToggled,
+                                  ),
+                                  style: AppFontStyle2.blinker(
+                                    color: Colorfile.lightblack,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(14, 14, 18, 14),
-                      child: Text(
-                        RegisteredDocumentStrings.getString(
-                          'note',
-                          widget.isToggled,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colorfile.lightwhite,
+                              ),
+                              color: Colorfile.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: TextButton(
+                              onPressed: () {
+                                print("Chat with Us button pressed");
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    AppImages.whatsapp,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    LocalizedStrings.getString(
+                                      'chatWithUs',
+                                      widget.isToggled,
+                                    ),
+                                    style: AppFontStyle2.blinker(
+                                      color: Colorfile.lightblack,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        style: AppFontStyle2.blinker(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF36322E),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                 ],
